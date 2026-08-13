@@ -1,0 +1,46 @@
+import numpy as np
+from skimage.transform import resize
+from skimage.filters import gabor
+class GistConverter:
+    """
+    A class to get the GIST values for an image
+    :param image_size: the size of the image
+    :param n_blocks: the number of blocks to compute
+    :param frequencies: the frequencies for the Gabor filtering
+    :param n_orientations: the number of orientations to compute
+    """
+    def __init__(self, image_size=128, n_blocks=4, frequencies=(0.1, 0.2, 0.3, 0.4), n_orientations=8):
+        self.image_size = image_size
+        self.n_blocks = n_blocks
+        self.frequencies = frequencies
+        self.n_orientations = n_orientations
+
+    def compute_gist(self, image_array):
+        """
+            Compute Gist descriptors from a given image
+            :param image_array: the image being computed in array form
+        """
+
+        # load the image and resize it to the preferred size based off of the parameter input
+        img = resize(image_array, (self.image_size, self.image_size), anti_aliasing=True)
+        img = img.astype(np.float32)
+
+        # creates the gabor filters using the defined number of orientations
+        gaborFilters = np.linspace(0, np.pi, self.n_orientations, endpoint=False)
+
+        features = []
+        # applies the gabor filters, amount is calculated by the number of frequencies x orientations
+        for freq in self.frequencies:
+            for chosenFilter in gaborFilters:
+                response, _ = gabor(img, frequency=freq, theta=chosenFilter)  # gets the real response to a gabor filter, not the imaginary
+
+                # divides image into  n_blocks x n_blocks grid
+                block_height = response.shape[0] // self.n_blocks
+                block_width = response.shape[1] // self.n_blocks
+
+                # loops over each block in the grid and calculates the mean response value, then adds it to the feature list
+                for i in range(self.n_blocks):
+                    for j in range(self.n_blocks):
+                        block = response[i * block_height:(i + 1) * block_height, j * block_width:(j + 1) * block_width]
+                        features.append(block.mean())
+        return np.array(features)
