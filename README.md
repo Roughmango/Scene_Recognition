@@ -1,1 +1,1 @@
-An image recognition program that has been implemented using Gist Classification as well as Naive Bayes. Is used to train on a dataset and is then tested on another. It only had an accuracy of 28%
+An image recognition program that has been implemented using Gist Classification as well as Naive Bayes. Is used to train on a dataset and is then tested on another. It only had an accuracy of 28 but was chosen as a simpler option, the classification options were refined in a group, this was just an individual attempt.
